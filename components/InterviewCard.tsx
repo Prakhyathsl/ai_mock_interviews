@@ -1,15 +1,15 @@
 "use client";
 import dayjs from 'dayjs';
 import Image from "next/image";
-import { getRandomInterviewCover } from "@/lib/utils";
+import { getInterviewCover } from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import DisplayTechIcons from "@/components/DisplayTechIcons";
-const InterviewCard = async ({ interviewId, userId, role, type, techstack,
+const InterviewCard = ({ interviewId, role, type, techstack,
                        createdAt}: InterviewCardProps) => {
     const feedback = null as Feedback | null;
     const normalizedType = /mix/gi.test(type) ? 'Mixed' : type;
-    const formattedDate = dayjs(createdAt).format("MMM D, YYYY");
+    const formattedDate = createdAt ? dayjs(createdAt).format("MMM D, YYYY") : 'N/A';
 
     return (
         <div className="card-border w-[360px] max-sm:w-full min-h-96">
@@ -18,7 +18,7 @@ const InterviewCard = async ({ interviewId, userId, role, type, techstack,
                     <div className="absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg bg-light-600">
                         <p className="badge-text">{normalizedType}</p>
                     </div>
-                    <Image src={getRandomInterviewCover()} alt="cover image" width={90} height={90} className="rounded-full object-fit size-[90px]">
+                    <Image src={getInterviewCover(interviewId)} alt="cover image" width={90} height={90} className="rounded-full object-fit size-[90px]">
                     </Image>
                     <h3 className="mt-5 capitalize">
                         {role} Interview

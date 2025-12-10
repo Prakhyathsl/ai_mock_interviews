@@ -27,22 +27,33 @@ export async function POST(request: Request){
     `,
         });
 
+        const createdAt = new Date().toISOString();
+        // Generate deterministic cover based on userid + role + techstack
+        // This ensures the same interview data always gets the same cover
+        const coverSeed = `${userid}-${role}-${techstack}`;
+        
         const interview = {
             role, type, level,
             techstack: techstack.split(','),
             questions: JSON.parse(questions),
             userId: userid,
             finalized: true,
-            coverImage: getRandomInterviewCover(),
-            createdAt: new Date().toISOString()
+            coverImage: getRandomInterviewCover(coverSeed),
+            createdAt
         }
 
         await db.collection("interviews").add(interview);
 
         return Response.json({ success: true}, {status: 200})
     } catch (error) {
-        console.error(error);
-
-        return Response.json({ success: false, error }, { status: 500 });
+        console.error("Error generating interview:", error);
+        
+        // Don't expose internal error details to client
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate interview";
+        
+        return Response.json({ 
+            success: false, 
+            error: errorMessage 
+        }, { status: 500 });
     }
 }

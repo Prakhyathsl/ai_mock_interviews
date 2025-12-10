@@ -80,7 +80,7 @@ export async function signIn(params: SignInParams) {
 
         await setSessionCookie(idToken);
     } catch (error: any) {
-        console.log("");
+        console.error("Error signing in:", error);
 
         return {
             success: false,
@@ -117,8 +117,14 @@ export async function getCurrentUser(): Promise<User | null> {
             ...userRecord.data(),
             id: userRecord.id,
         } as User;
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        // If Firebase Admin is not initialized (missing env vars), return null gracefully
+        // This allows the build to succeed even if env vars aren't set
+        if (error?.message?.includes("Firebase Admin is not initialized")) {
+            return null;
+        }
+        
+        console.error("Error getting current user:", error);
 
         // Invalid or expired session
         return null;
